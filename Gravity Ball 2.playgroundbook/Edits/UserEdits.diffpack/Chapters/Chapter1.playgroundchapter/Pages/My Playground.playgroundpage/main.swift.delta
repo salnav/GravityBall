@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diffs</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import SpriteKit
+import UIKit
+import PlaygroundSupport
+
+var gravityConstant = CGVector()
+var planetName = ""
+let label = SKLabelNode()
+let infoButton = SKSpriteNode(imageNamed: "info.png")
+class GameScene: SKScene, SKPhysicsContactDelegate  {
+    
+    
+    var point: CGPoint = CGPoint()
+    var dragging: Bool = false
+    let back = SKSpriteNode(imageNamed: "refresh-3114508.png")
+    
+    let infoLabel = SKLabelNode()
+    let infoContainer = SKShapeNode(rect: CGRect(x: 119, y: 300, width: 450, height: 550))
+    let infoText = [
+        "Sun" : "The gravitational acceleration on the Sun is a whopping -274 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large. The mass of the Sun is an enormous 1.989 × 10^30 kg.",
+        
+        "Earth" : "The gravitational acceleration on Earth is a moderate -9.8 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large and is weak when the combined mass between two objects is small. The mass of the Earth is relatively average at 5.972 × 10^24 kg.",
+        
+        "Mercury" : "The gravitational acceleration on Mercury is a mere -3.7 metres per second squared. This is because the pull of gravity is weak when the combined mass between two objects is small. The mass of Mercury is relatively small at 3.285 × 10^23 kg.",
+        
+        "Venus" : "The gravitational acceleration on Venus is a tolerable -8.9 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large and is weak when the combined mass between two objects is small. The mass of Venus is relatively average at 4.867 × 10^24 kg.",
+        
+        "Mars" : "The gravitational acceleration on Mars is a mere -3.7 metres per second squared. This is because the pull of gravity is weak when the combined mass between two objects is small. The mass of Mars is relatively small at 6.39 × 10^23 kg.",
+        
+        "Jupiter" : "The gravitational acceleration on Jupiter is a rapid -24.9 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large. The mass of Jupiter is relatively large at 1.898 × 10^27 kg.",
+        
+        "Saturn" : "The gravitational acceleration on Saturn is a relatively fast -10.4 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large. The mass of Saturn is relatively big at 5.683 × 10^26 kg.",
+        
+        "Uranus" : "The gravitational acceleration on Uranus is a tolerable -8.9 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large and is weak when the combined mass between two objects is small. The mass of Uranus is relatively average at 8.681 × 10^25 kg.",
+        
+        "Neptune" : "The gravitational acceleration on Neptune is a relatively quick -11.2 metres per second squared. This is because the pull of gravity is strong when the combined mass between two objects is large. The mass of Neptune is relatively great at 1.024 × 10^26 kg."
+        
+        
+        
+    
+    ]
+    
+    override func didMove(to view: SKView) {
+        
+        
+        label.position = CGPoint(x: self.frame.width/2, y: 980)
+        label.fontName = "Kailasa Bold"
+        back.position = CGPoint(x: 45, y: 989)
+        back.size = CGSize(width: 60, height: 60)
+        
+        let top = SKShapeNode(rect: CGRect(x: 0, y: 949, width: 683, height: 75))
+        top.fillColor = UIColor(red: 45, green: 45, blue: 45, alpha: 1)
+        self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+
+        physicsWorld.contactDelegate = self
+        self.backgroundColor = .white
+        
+        
+        
+        self.addChild(ball)
+        self.addChild(top)
+        self.addChild(back)
+        self.addChild(label)
+        setUpInfo()
+    }
+    
+    
+    
+    lazy var ball: SKShapeNode = {
+        
+        let node = SKShapeNode(circleOfRadius: 25)
+        node.fillColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        node.physicsBody = SKPhysicsBody(circleOfRadius: 25)
+        node.position = CGPoint(x:self.frame.midX , y:self.frame.midY)
+        node.physicsBody?.affectedByGravity = true
+        node.physicsBody?.allowsRotation = false
+
+        return node
+        
+    }()
+    
+    func setUpInfo() {
+        infoButton.position = CGPoint(x: 625, y: 989)
+        infoButton.size = CGSize(width: 50, height: 50)
+        self.addChild(infoButton)
+        infoContainer.fillColor = .black
+        infoLabel.fontColor = .white
+        infoLabel.fontName = "Kaiti SC font"
+        infoLabel.position = CGPoint(x: self.frame.width/2, y: 500)
+        infoLabel.numberOfLines = 0
+        infoLabel.preferredMaxLayoutWidth = 400
+        infoLabel.isHidden = true
+        infoContainer.isHidden = true
+        
+        self.addChild(infoContainer)
+        self.addChild(infoLabel)
+        
+    }
+    
+
+    
+    override func touchesBegan(_ touches: Set&lt;UITouch&gt;, with event: UIEvent?) {
+
+        let touch = touches.first!
+        let location = touch.location(in:self)
+        if ball.frame.contains(location) {
+            point = location
+            dragging = true
+        } else {
+            
+            dragging = false
+            
+        }
+        
+        if back.frame.contains(location) {
+        
+        
+            PlaygroundPage.current.liveView = PlacePickerController()
+        
+    }
+        
+        if label.text != "Custom" &amp;&amp; infoButton.frame.contains(location) &amp;&amp; infoLabel.isHidden {
+            
+            infoLabel.text = infoText[label.text!]
+            infoLabel.isHidden = false
+            infoContainer.isHidden = false
+            infoLabel.position.y = 500 - abs(343-infoLabel.frame.height)
+            
+        } else {
+            
+            infoLabel.isHidden = true
+            infoContainer.isHidden = true
+            
+        }
+        
+        
+
+    }
+    
+    
+    override func touchesMoved(_ touches: Set&lt;UITouch&gt;, with event: UIEvent?) {
+        let touch = touches.first!
+        let location = touch.location(in: self)
+        point = location
+
+    }
+    
+    override func touchesEnded(_ touches: Set&lt;UITouch&gt;, with event: UIEvent?) {
+        dragging = false
+
+    }
+    
+    
+    override func update(_ currentTime: TimeInterval) {
+
+        
+        if dragging {
+            
+            physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+            
+            ball.position = point
+
+            
+            switch point.x {
+            
+            case 683... : 
+                
+                ball.position.x = 683
+            case ..&lt;0 :
+                ball.position.x = 0
+                
+            default: 
+                break
+            
+            
+            }
+            
+            switch point.y {
+            
+            case 924... : 
+                
+                ball.position.y = 924
+            case ..&lt;0 : 
+                
+                ball.position.y = 10
+                
+            default: 
+                break
+                
+                
+            }
+            
+            
+        }else {
+            
+            
+            physicsWorld.gravity = gravityConstant
+            
+            
+            
+            
+        }
+    }
+}
+
+
+let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 683, height: 1024))
+
+let scene = GameScene(size: CGSize(width: 683, height: 1024)) 
+    
+    scene.scaleMode = .aspectFit
+    
+    sceneView.presentScene(scene)
+
+
+class PlacePickerController: UIViewController {
+    
+    
+    let slider = UISlider(frame: CGRect(x: 225, y: 900, width: 300, height: 20))
+    let speedLabel = UILabel(frame: CGRect(x: 350, y: 925, width: 150, height: 30))
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "pexels-photo-998641.jpeg"))
+        
+        self.setUpSlider()
+        self.setUpCustomLabel()
+        self.setUpSpeedLabel()
+        self.setUpGoButton()
+        self.makeSolarSystemRings()
+        self.setUpPlanetButtons()
+        self.setUpHeader()
+        
+        
+        
+        
+    }
+    
+    func setUpGoButton() {
+        let goButton = UIButton(frame: CGRect(x: 550, y: 880, width: 50, height: 50))
+        self.view.addSubview(goButton)
+        goButton.setTitle("Go", for: .normal)
+        goButton.backgroundColor = #colorLiteral(red: 0.2275036573, green: 0.5323064327, blue: 0.9950136542, alpha: 1.0)
+        goButton.layer.cornerRadius = CGFloat(25)
+        goButton.addTarget(self, action: #selector(goPressed), for: .touchUpInside)
+        
+        
+    }
+    
+    
+    
+    func setUpSlider() {
+        
+        slider.addTarget(self, action: #selector(sliderMoved(_:)) , for: .valueChanged)
+        slider.minimumValue = 0
+        slider.maximumValue = 100
+        self.view.addSubview(slider)
+        
+    }
+    
+    func setUpSpeedLabel() {
+        let formatted = NSMutableAttributedString(string: "0.0 m/s2")
+        formatted.setAttributes([.baselineOffset:10], range: NSRange(location: 7, length: 1) )
+        speedLabel.attributedText = formatted
+        self.view.addSubview(speedLabel)
+    }
+    
+    func setUpHeader() {
+        let title = UILabel(frame: CGRect(x: 300, y: 0, width: 160, height: 100))
+        let description = UITextView(frame: CGRect(x: 140, y: 75, width: 500, height: 150))
+        
+        title.text = "Gravity Ball"
+        title.font = UIFont(name: "Arial Bold", size: 30)
+        description.backgroundColor = .clear
+        description.text = "Select a planet and then drag and drop the ball to observe the relative gravity on that planet"
+        description.font = UIFont(name: "Arial Bold", size: 20)
+        description.textAlignment = .center
+        description.isEditable = false
+        description.isSelectable  = false
+        title.textColor = .white
+        description.textColor = .white
+        self.view.addSubview(description)
+        self.view.addSubview(title)
+        
+    }
+    
+    func setUpCustomLabel() {
+        let custom = UILabel(frame: CGRect(x: 325, y: 850, width: 150, height: 30))
+        custom.text = "Custom"
+        custom.font = UIFont(name: "Arial Bold", size: 30)
+        self.view.addSubview(custom)
+    }
+    
+    func makeSolarSystemRings() {
+        
+        let rings = UIView(frame: CGRect(x: 220, y: 300, width: 300, height: 300))
+        for i in 0...7 {
+            let circle = UIBezierPath(arcCenter: CGPoint(x: 150, y: 175), radius: CGFloat(62.5+Double((i*35))), startAngle: 0, endAngle: CGFloat(Double.pi * 2), clockwise: true)
+            let shape = CAShapeLayer()
+            shape.path = circle.cgPath
+            
+            shape.fillColor = UIColor.clear.cgColor
+            
+            shape.strokeColor = UIColor.white.cgColor
+            
+            shape.lineWidth = 1.5
+            rings.layer.addSublayer(shape)
+            
+        }
+        
+        self.view.addSubview(rings)
+        
+    }
+    
+    
+    
+    
+    var sliderNum = 0.0
+    
+    @objc func sliderMoved(_ sender: UISlider!) {
+        let num = String(format: "%.1f", slider.value)
+        sliderNum = Double(num)!
+        let string = "\(num) m/s"
+        let formatted = NSMutableAttributedString(string: "\(num) m/s2")
+        formatted.setAttributes([.baselineOffset:10], range: NSRange(location: string.count, length: 1) )
+        speedLabel.attributedText = formatted
+        
+    }
+    
+    func makePlanet(factor: Double, X: Double, Y: Double, action: Selector,  image: UIImage , saturnCheck: Bool ) {
+        let planetButton = UIButton(type: UIButton.ButtonType.custom)
+        planetButton.setImage(image, for: .normal)
+        planetButton.addTarget(self, action: action, for: .touchUpInside) 
+        
+        if saturnCheck { 
+            
+            planetButton.frame = CGRect(x: X, y: Y, width: 75, height: 61)
+            
+        } else {
+            
+            let wH: Double = 150 * factor
+            planetButton.frame = CGRect(x: X, y: Y, width: wH, height: wH)
+            
+        }
+        
+        self.view.addSubview(planetButton)
+    }
+    
+    @objc func goPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -sliderNum)
+        infoButton.isHidden = true
+        label.text = "Custom"
+        PlaygroundPage.current.liveView = sceneView
+        
+        
+    }
+    
+    
+    func setUpPlanetButtons() {
+        //sun
+        makePlanet(factor: 1/2, X: 332.5, Y: 435, action: #selector(sunPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (6).png"), saturnCheck: false)
+        
+        //earth
+        makePlanet(factor: 1/4, X: 350, Y: 325, action: #selector(earthPressed),  image: #imageLiteral(resourceName: "output-onlinepngtools (5).png"), saturnCheck: false)
+        
+        //mercury
+        makePlanet(factor: 1/8, X: 350, Y: 525, action: #selector(mercuryPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (8).png"), saturnCheck: false)
+        
+        //venus
+        makePlanet(factor: 1/6, X: 455, Y: 472.5, action: #selector(venusPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (7).png"), saturnCheck: false)
+        
+        //mars
+        let mars = makePlanet(factor: 1/6, X: 515, Y: 400, action: #selector(marsPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (9).png"), saturnCheck: false)
+        
+        //jupiter
+        makePlanet(factor: 1/3, X: 145, Y: 445, action: #selector(jupiterPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (10).png"), saturnCheck: false )
+        
+        //saturn
+        makePlanet(factor: 1/3, X: 180, Y: 265, action: #selector(saturnPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (11).png"), saturnCheck: true  )
+        
+        //uranus
+        makePlanet(factor: 1/4, X: 505, Y: 675, action: #selector(uranusPressed), image: #imageLiteral(resourceName: "output-onlinepngtools (12).png"), saturnCheck: false)
+        
+        //neptune
+        makePlanet(factor: 1/4, X: 100, Y: 625, action: #selector(neptunePressed), image: #imageLiteral(resourceName: "output-onlinepngtools (13).png"), saturnCheck: false)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    @objc func earthPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -9.8)
+        label.text = "Earth"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+        
+    }
+    
+    @objc func sunPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -274)
+        label.text = "Sun"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func mercuryPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -3.7)
+        label.text = "Mercury"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func venusPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -8.9)
+        label.text = "Venus"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func marsPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -3.7)
+        label.text = "Mars"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func jupiterPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -24.9)
+        label.text = "Jupiter"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    @objc func saturnPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -10.4)
+        label.text = "Saturn"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func uranusPressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -8.9)
+        label.text = "Uranus"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    @objc func neptunePressed() {
+        
+        gravityConstant = CGVector(dx: 0, dy: -11.2)
+        label.text = "Neptune"
+        infoButton.isHidden = false
+        PlaygroundPage.current.liveView = sceneView
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
+
+PlaygroundPage.current.liveView = PlacePickerController()
+
+
+
+#imageLiteral(resourceName: "refresh-3114508.png")
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 16631}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>FormatVersion</key>
+	<integer>2</integer>
+</dict>
+</plist>
